@@ -7,6 +7,8 @@ import re
 import copy
 from game_1 import gra
 from game_2 import gra2
+from threading import Thread
+from labirynt import main_labirynt
 def cleaar():
     os.system('cls' if os.name == 'nt' else 'clear')
 class Energy(object):
@@ -319,11 +321,14 @@ def game_funtion(coordinates, index, board_index2):
     if board_index2[coordinates[0]][coordinates[1]] == "*":
         time.sleep(1)
         cleaar()
-        game = random.choice(("game_1", "game_2"))
+        #game = random.choice(("game_1", "game_2", "labirynt"))
+        game = "labirynt"
         if game == "game_1":
             gra(index)
         elif game == "game_2":
             gra2(index)
+        elif game == "labirynt":
+            main_labirynt(index)
         time.sleep(1)
         cleaar()
         get_board(index)
@@ -389,4 +394,3 @@ def main():
     board_move(index)
 
 
-main()
