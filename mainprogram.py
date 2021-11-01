@@ -226,11 +226,26 @@ def board_move(index):
     for x in range(0, 5):
         first = int(random.randrange(1, 29))
         second = int(random.randrange(1, 54))
-        if board_index[first][second] == " ": board_index[first][second] = "*"
+        while board_index[first][second] != " ":
+            first = int(random.randrange(1, 29))
+            second = int(random.randrange(1, 54))
+        board_index[first][second] = "*"
     for x in range(0, 6):
         first = int(random.randrange(1, 29))
         second = int(random.randrange(1, 54))
-        if board_index[first][second] == " ": board_index[first][second] = "#"
+        while board_index[first][second] != " ":
+            first = int(random.randrange(1, 29))
+            second = int(random.randrange(1, 54))
+        board_index[first][second] = "#"
+    first = int(random.randrange(1, 26))
+    second = int(random.randrange(1, 51))
+    while board_index[first][second] != " ":
+        first = int(random.randrange(1, 26))
+        second = int(random.randrange(1, 51))
+    board_index[first][second] = "B"
+    board_index[first][second+1] = "A"
+    board_index[first][second+2] = "N"
+    board_index[first][second+3] = "K"
     board_index2 = copy.deepcopy(board_index)
     coordinates = [28, 1]
     board_index2[coordinates[0]][coordinates[1]] = " "
@@ -242,6 +257,7 @@ def board_move(index):
         if key in ("w", "a", "s", "d"):
             mystery(coordinates, index, board_index2)
             game_funtion(coordinates, index, board_index2)
+            bank(coordinates, index, board_index2)
         time.sleep(0.000002)
         key = getkey()
         if key == "0":
@@ -294,6 +310,10 @@ def inventory_user(index):
         users[index].del_inventory(int(choose)-1)
     except IndexError : pass
     except ValueError : pass
+
+def bank(coordinates, index, board_index2):
+    if board_index2[coordinates[0]][coordinates[1]] in ("B", "A", "N", "K"):
+        print("bankus")
 def mystery(coordinates, index, board_index2):
     if board_index2[coordinates[0]][coordinates[1]] == "#":
         time.sleep(1)
@@ -321,8 +341,7 @@ def game_funtion(coordinates, index, board_index2):
     if board_index2[coordinates[0]][coordinates[1]] == "*":
         time.sleep(1)
         cleaar()
-        #game = random.choice(("game_1", "game_2", "labirynt"))
-        game = "labirynt"
+        game = random.choice(("game_1", "game_2", "labirynt"))
         if game == "game_1":
             gra(index)
         elif game == "game_2":

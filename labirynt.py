@@ -1,4 +1,3 @@
-board_index = []
 import random
 from datetime import datetime
 from getkey import getkey, keys
@@ -10,7 +9,7 @@ from threading import Thread
 from colorama import init, Fore, Back, Style
 def cleaar():
     os.system('cls' if os.name == 'nt' else 'clear')
-def board_create():
+def board_create(board_index):
     for x in range(0, 40):
         board_index.append([])
     for x in range(0, 40):
@@ -92,7 +91,7 @@ def game_rules():
     click ENTER if you read it...""")
     enter = input("")
 
-def get_board():
+def get_board(board_index):
     for x in range(0, 40):
         for y in range(0, 65):
             if board_index[x][y] == "#" : print("\033[38;5;241m"+board_index[x][y], end ="")
@@ -114,7 +113,7 @@ def b_m():
         global click
         if click == False : click2 = False
         
-def board_move(index):
+def board_move(index, board_index):
     board_index2 = copy.deepcopy(board_index)
     for x in range(1, 39): 
         for y in range(1, 64):
@@ -130,7 +129,7 @@ def board_move(index):
     time.sleep(3)
     while click:
         cleaar()
-        get_board()
+        get_board(board_index)
         now = datetime.now()
         time2 = now.hour*60*60 + now.minute*60 + now.second + now.microsecond/1000000
         print("Game time:",  round(120 - (time2-time1), 1))
@@ -200,9 +199,10 @@ def time_getter():
     return rantime
 
 def main_labirynt(index):
-    board_create()
+    board_index = []
+    board_create(board_index)
     game_rules()
     if __name__ == 'labirynt':
         Thread(target = b_m).start()
-        Thread(target = board_move(index)).start()
+        Thread(target = board_move(index, board_index)).start()
         
