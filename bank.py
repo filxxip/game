@@ -9,9 +9,9 @@ def deposit(index, a, users):
     while money == None:
         try: 
             money = int(input("How much money do want to put into the deposit? if you want to return click 0: "))
-            #while money > users[index].get_money():
-            print("You don't have enough money :(")
-            money = int(input("How much money do want to put into the deposit? if you want to return, click 0: "))
+            while money > users[index].get_money():
+                print("You don't have enough money :(")
+                money = int(input("How much money do want to put into the deposit? if you want to return, click 0: "))
             if money >0:
                 rate = int(input("How many days you want to wait? "))
                 profit = int((rate/100)*money)
@@ -19,11 +19,12 @@ def deposit(index, a, users):
                 now = datetime.now()
                 deposits[index] +=str(money) + "," + str(rate)+ "," +str(now)+ ";"
                 a = False
-        except ValueError: print("Incorrect number")
+        except ValueError: 
+            print("Incorrect number")
+            money = 0
     for x in range(0, len(deposits)):
         deposits[x] += "\n"
     user_bank_deposit = open("user_bank_deposit.txt", "w")
-    print(deposits)
     user_bank_deposit.writelines(deposits)
     users[index].set_money(users[index].get_money()-money)
     user_bank_deposit.close()
@@ -51,27 +52,36 @@ def deposit_checker(index, users):
     user_bank_deposit = open("user_bank_deposit.txt", "r")
     deposits = user_bank_deposit.readlines()
     deposits_info = re.split("\;", deposits[index])
+    todel = []
     try:
+        help = re.split("\;", deposits[index])
         for x in range (len(deposits_info)):
             deposits_info[x] = re.split("\,", deposits_info[x])
         for x in range(len(deposits_info)):
             for y in range(len(deposits_info[x])):
                 deposits_info[x][y]= re.split("[\ \:\,\-\.]", deposits_info[x][y])
         print("Your deposits: ")
-        for x in range (len(deposits_info)-1):
-            print("\nNUMBER", x+1, ":")
+        for x in range (1,len(deposits_info)-1):
+            print("\nNUMBER", x, ":")
             print("Value :", deposits_info[x][0][0], "$")
             print("Rate :", deposits_info[x][1][0]+ "%")
             print("Date:", deposits_info[x][2][0] + ":" + deposits_info[x][2][1] + ":" + deposits_info[x][2][2] + " , " + deposits_info[x][2][3]+ ":" + deposits_info[x][2][4])
-        for x in range(len(deposits_info)-1):
+        for x in range(1, len(deposits_info)-1):
             time_then = int(deposits_info[x][2][0])*365*24*60 + month_changer(deposits_info[x][2][1])*24*60 +int(deposits_info[x][2][2])*24*60 + int(deposits_info[x][2][3])*60 + int(deposits_info[x][2][4])
-            if time_now - time_then > int(deposits_info[x][1][0])*365*24*60:
-                users[index].set_money(users[index].get_money()+int(int(credits_info[x][0][0])*(1+(int(credits_info[x][1][0])/100))))
+            if time_now - time_then > int(deposits_info[x][1][0])*24*60:
+                users[index].set_money(users[index].get_money()+int(int(deposits_info[x][0][0])*(1+(int(deposits_info[x][1][0])/100))))
                 print("Congratulation, you've got some extra coins!  ")
-                del deposits_info[x]
+                todel.append(help[x])
+        for x in todel:
+            help.remove(x)
+        string = ""
+        for x in range(len(help)-1):
+            string +=help[x]+";"
+        string +="\n"
+        deposits[index] = string
     except IndexError: pass
     user_bank_deposit = open("user_bank_deposit.txt", "w")
-    user_bank_deposit.writelines(deposits_info)
+    user_bank_deposit.writelines(deposits)
     user_bank_deposit.close()
 def credit_checker(index, users):
     now = datetime.now()
@@ -81,31 +91,39 @@ def credit_checker(index, users):
     credits = user_bank_credit.readlines()
     credits_info = re.split("\;", credits[index])
     try:
+        help = re.split("\;", credits[index])
         for x in range (len(credits_info)):
             credits_info[x] = re.split("\,", credits_info[x])
         for x in range(len(credits_info)):
             for y in range(len(credits_info[x])):
                 credits_info[x][y]= re.split("[\ \:\,\-\.]", credits_info[x][y])
-        print("Your credits: ")
-        for x in range (len(credits_info)-1):
-            print("\nNUMBER", x+1, ":")
+        print("\n\nYour credits: ")
+        for x in range (1, len(credits_info)-1):
+            print("\nNUMBER", x, ":")
             print("Value :", credits_info[x][0][0], "$")
             print("Rate :", credits_info[x][1][0]+ "%")
             print("Date:", credits_info[x][2][0] + ":" + credits_info[x][2][1] + ":" + credits_info[x][2][2] + " , " + credits_info[x][2][3]+ ":" + credits_info[x][2][4])
         for x in range(len(credits_info)-1):
             time_then = int(credits_info[x][2][0])*365*24*60 + month_changer(credits_info[x][2][1])*24*60 +int(credits_info[x][2][2])*24*60 + int(credits_info[x][2][3])*60 + int(credits_info[x][2][4])
-            if time_now - time_then > int(credits_info[x][1][0])*365*24*60:
+            if time_now - time_then > int(credits_info[x][1][0])*24*60:
                 users[index].set_money(users[index].get_money()-int(int(credits_info[x][0][0])*(1+(int(credits_info[x][1][0])/100))))
                 if users[index].get_money() >= 0:
                     print("Congratulation, you have paid off your credit yet!  ")
                 else:
                     print("You have paid your credit off but now you have one credit more because you didnt have enough money")
-                    credits[index].rstrip() +=str((-users[index].get_money()) + "," + str(10) + "," + str(now) + ";"+ "\n")
+                    credits_info[index] = credits_info[index].rstrip() +str((-users[index].get_money()) + "," + str(10) + "," + str(now) + ";"+ "\n")
                     users[index].set_money(0)
-                del credits_info[x]
+                help.remove(help[x])
+        string = ""
+        for x in range(len(help)-1):
+            string +=help[x]+";"
+        string +="\n"
+        credits[index+1] = string
+
+            
     except IndexError: pass
     user_bank_credit = open("user_bank_credit.txt", "w")
-    user_bank_credit.writelines(credits_info)
+    user_bank_credit.writelines(credits)
     user_bank_credit.close()
 def credit(index, a, users):
     user_bank_credit = open("user_bank_credit.txt", "r")
@@ -121,7 +139,6 @@ def credit(index, a, users):
                 profit = int((rate/100)*money)
                 print("After this period you will have to return", profit, "extra money.")
                 now = datetime.now()
-                print(credits)
                 credits[index] +=str(money) + "," + str(rate) + "," + str(now) + ";"
                 a = False
         except ValueError: print("Incorrect number")
@@ -133,9 +150,6 @@ def credit(index, a, users):
     user_bank_credit.close()
     return a
 
-index = 4
-a = 3
-credit_checker(index)
 
 
 
@@ -143,9 +157,10 @@ credit_checker(index)
 
 
 
-def main(index):
+def bankk(index):
     from mainprogram import users
-
+    deposit_checker(index, users)
+    credit_checker(index, users)
     print("""
     Here you can save your money and after few days receive more, or take a loan but then you have to return us some bonus coins.
     1 - make a deposit
@@ -155,8 +170,10 @@ def main(index):
         click = input("What do you want to do? write 1 or 2 ")
         if click == "1":
             a = deposit(index, a, users)
-        if click == "2":
+        elif click == "2":
             a = credit(index, a, users)
+        elif click =="q":
+            a = False
         else:
-            print("Incorrect choice..")
+            print("Incorrect choice.....")
     

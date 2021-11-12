@@ -9,6 +9,8 @@ from game_1 import gra
 from game_2 import gra2
 from threading import Thread
 from labirynt import main_labirynt
+from bank import bankk
+from ball import balll
 def cleaar():
     os.system('cls' if os.name == 'nt' else 'clear')
 class Energy(object):
@@ -98,6 +100,12 @@ def user_create():
     cleaar()
     user_file = open("user_database.txt", "a")
     user_file_2 = open("user_database_2.txt", "a")
+    bank_dep = open("user_bank_deposit.txt", "a")
+    bank_cred = open("user_bank_credit.txt", "a")
+    bank_cred.write("#;\n")
+    bank_dep.write("#;\n")
+    bank_dep.close()
+    bank_cred.close()
     name = input("Write your name: ")
     print("User created")
     users.append(User(name))
@@ -256,7 +264,10 @@ def board_move(index):
         get_board(index)
         if key in ("w", "a", "s", "d"):
             mystery(coordinates, index, board_index2)
-            game_funtion(coordinates, index, board_index2)
+            condition = True
+            while condition:
+                game_funtion(coordinates, index, board_index2)
+                condition = False
             bank(coordinates, index, board_index2)
         time.sleep(0.000002)
         key = getkey()
@@ -313,7 +324,8 @@ def inventory_user(index):
 
 def bank(coordinates, index, board_index2):
     if board_index2[coordinates[0]][coordinates[1]] in ("B", "A", "N", "K"):
-        print("bankus")
+        cleaar()
+        bankk(index)
 def mystery(coordinates, index, board_index2):
     if board_index2[coordinates[0]][coordinates[1]] == "#":
         time.sleep(1)
@@ -341,13 +353,16 @@ def game_funtion(coordinates, index, board_index2):
     if board_index2[coordinates[0]][coordinates[1]] == "*":
         time.sleep(1)
         cleaar()
-        game = random.choice(("game_1", "game_2", "labirynt"))
+        game = random.choice(("game_1", "game_2", "labirynt", "ball"))
         if game == "game_1":
             gra(index)
         elif game == "game_2":
             gra2(index)
         elif game == "labirynt":
             main_labirynt(index)
+        elif game == "ball":
+
+            balll(index)
         time.sleep(1)
         cleaar()
         get_board(index)
